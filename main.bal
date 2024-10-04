@@ -1,8 +1,12 @@
 import ballerina/http;
+import ballerina/log;
+
+listener http:Listener vaccineStatusListener = new(9002);
 
 service /covid/status on new http:Listener(9000) {
 
     resource function get countries() returns CovidEntry[] {
+        log:printInfo("Get all countries");
         return covidTable.toArray();
     }
 
@@ -14,18 +18,21 @@ service /covid/status on new http:Listener(9000) {
             select covidEntry.iso_code;
 
         if conflictingISOs.length() > 0 {
+            log:printInfo("Conflicting ISO Codes");
             return {
                 body: {
                     errmsg: string:'join(" ", "Conflicting ISO Codes:", ...conflictingISOs)
                 }
             };
         } else {
+            log:printInfo("Adding new countries");
             covidEntries.forEach(covdiEntry => covidTable.add(covdiEntry));
             return covidEntries;
         }
     }
 
     resource function get countries/[string iso_code]() returns CovidEntry|InvalidIsoCodeError {
+        log:printInfo("Get country by ISO Code");
         CovidEntry? covidEntry = covidTable[iso_code];
         if covidEntry is () {
             return {
@@ -35,6 +42,32 @@ service /covid/status on new http:Listener(9000) {
             };
         }
         return covidEntry;
+    }
+}
+
+service / on new http:Listener(9001) {
+    resource function get healthz() returns string {
+        log:printInfo("Health check");
+        return "OK";
+    }
+}
+
+service on vaccineStatusListener {
+    resource function get vaccination/status() returns string {
+        log:printInfo("Vaccination status");
+        return "Vaccination is in progress";
+    }
+}
+
+service /covid/community on new http:Listener(9003) {
+    resource function get status() returns string {
+        log:printInfo("Community status");
+        return "Community is safe";
+    }
+
+    resource function get status/[string iso_code]() returns string {
+        log:printInfo("Community status by ISO Code");
+        return "Community is safe";
     }
 }
 
