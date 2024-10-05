@@ -5,7 +5,7 @@ endpoints:
   # +required Unique name for the endpoint. (This name will be used when generating the managed API)
 - name: GraphQL Covid19 API
   # +required Numeric port value that gets exposed via this endpoint
-  port: 8095
+  port: 8094
   # +required Type of the traffic this endpoint is accepting. Example: REST, GraphQL, etc.
   # Allowed values: REST, GraphQL, GRPC
   type: GraphQL
@@ -15,3 +15,27 @@ endpoints:
   # +optional Context (base path) of the API that is exposed via this endpoint.
   # This is mandatory if the endpoint type is set to REST or GraphQL.
   context: /covid19
+
+- name: Covid Status
+  port: 9000
+  type: REST
+  networkVisibility: Public
+  context: /covid/status
+
+- name: Health Check
+  port: 9001
+  type: REST
+  networkVisibility: Public
+  context: /
+
+- name: Covid19 Data
+  port: 9003
+  type: REST
+  networkVisibility: Public
+  context: /covid/community/support
+
+- name: Covid19 Vaccination Status
+  port: 9002
+  type: REST
+  networkVisibility: Public
+  context: /
