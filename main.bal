@@ -1,7 +1,6 @@
 import ballerina/graphql;
 import ballerina/http;
 import ballerina/log;
-import ballerinax/wso2.controlplane as _;
 
 public type CovidEntry record {|
     readonly string isoCode;
