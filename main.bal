@@ -130,6 +130,13 @@ service / on new http:Listener(9001) {
     }
 }
 
+service on new http:Listener(9097) {
+    resource function get healthz() returns string {
+        log:printInfo("Health check");
+        return "OK";
+    }
+}
+
 service on vaccineStatusListener {
     resource function get vaccination/status() returns string {
         log:printInfo("Vaccination status");
@@ -147,4 +154,18 @@ service /covid/community/support on new http:Listener(9003) {
         log:printInfo("Community support status by ISO Code");
         return "Community is under lockdown and aids are being provided";
     }
+}
+
+
+listener http:Listener httpListener = new (9093);
+
+http:Service obj = service object {
+    resource function get hello() returns string {
+        log:printInfo("Say Hello");
+        return "Hello!";
+    }
+};
+
+function init() returns error? {
+    check httpListener.attach(obj);
 }
