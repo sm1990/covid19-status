@@ -144,17 +144,17 @@ service on vaccineStatusListener {
     }
 }
 
-//service /covid/community/support on new http:Listener(9003) {
-//    resource function get status() returns string {
-//        log:printInfo("Community support status");
-//        return "World is supporting each other";
-//    }
-//
-//    resource function get status/[string isoCode]() returns string {
-//        log:printInfo("Community support status by ISO Code");
-//        return "Community is under lockdown and aids are being provided";
-//    }
-//}
+service /covid/community/support on new http:Listener(9003) {
+    resource function get status() returns string {
+        log:printInfo("Community support status");
+        return "World is supporting each other";
+    }
+
+    resource function get status/[string isoCode]() returns string {
+        log:printInfo("Community support status by ISO Code");
+        return "Community is under lockdown and aids are being provided";
+    }
+}
 
 
 listener http:Listener httpListener = new (9093);
