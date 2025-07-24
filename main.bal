@@ -1,3 +1,4 @@
+import ballerina/graphql;
 import ballerina/http;
 import ballerina/log;
 
@@ -52,6 +53,34 @@ public distinct service class CovidData {
     resource function get active() returns int? => self.entryRecord.active;
 }
 
+@graphql:ServiceConfig {
+    graphiql: {
+        enabled: true
+    }
+}
+service /covid19 on new graphql:Listener(9094) {
+
+    resource function get all() returns CovidData[] {
+        log:printInfo("Get all countries");
+        return from CovidEntry entry in covidEntriesTable select new (entry);
+    }
+
+    resource function get filter(string isoCode) returns CovidData? {
+        log:printInfo("Get country by ISO Code");
+        if covidEntriesTable.hasKey(isoCode) {
+            return new CovidData(covidEntriesTable.get(isoCode));
+        }
+        return;
+    }
+
+    remote function add(CovidEntry entry) returns CovidData {
+        log:printInfo("Adding new countries");
+        covidEntriesTable.add(entry);
+        return new CovidData(entry);
+    }
+}
+
+
 service /covid/status on new http:Listener(9000) {
 
     resource function get countries() returns CovidEntry[] {
@@ -94,12 +123,12 @@ service /covid/status on new http:Listener(9000) {
     }
 }
 
-//service / on new http:Listener(9001) {
-//    resource function get healthz() returns string {
-//        log:printInfo("Health check");
-//        return "OK";
-//    }
-//}
+service / on new http:Listener(9001) {
+   resource function get healthz() returns string {
+       log:printInfo("Health check");
+       return "OK";
+   }
+}
 
 service on new http:Listener(9097) {
     resource function get healthz() returns string {
