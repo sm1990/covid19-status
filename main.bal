@@ -1,4 +1,3 @@
-import ballerina/graphql;
 import ballerina/http;
 import ballerina/log;
 
@@ -52,34 +51,6 @@ public distinct service class CovidData {
 
     resource function get active() returns int? => self.entryRecord.active;
 }
-
-@graphql:ServiceConfig {
-    graphiql: {
-        enabled: true
-    }
-}
-service /covid19 on new graphql:Listener(9094) {
-
-    resource function get all() returns CovidData[] {
-        log:printInfo("Get all countries");
-        return from CovidEntry entry in covidEntriesTable select new (entry);
-    }
-
-    resource function get filter(string isoCode) returns CovidData? {
-        log:printInfo("Get country by ISO Code");
-        if covidEntriesTable.hasKey(isoCode) {
-            return new CovidData(covidEntriesTable.get(isoCode));
-        }
-        return;
-    }
-
-    remote function add(CovidEntry entry) returns CovidData {
-        log:printInfo("Adding new countries");
-        covidEntriesTable.add(entry);
-        return new CovidData(entry);
-    }
-}
-
 
 service /covid/status on new http:Listener(9000) {
 
@@ -144,17 +115,17 @@ service on vaccineStatusListener {
     }
 }
 
-// service /covid/community/support on new http:Listener(9003) {
-//     resource function get status() returns string {
-//         log:printInfo("Community support status");
-//         return "World is supporting each other";
-//     }
+service /covid/community/support on new http:Listener(9003) {
+    resource function get status() returns string {
+        log:printInfo("Community support status");
+        return "World is supporting each other";
+    }
 
-//     resource function get status/[string isoCode]() returns string {
-//         log:printInfo("Community support status by ISO Code");
-//         return "Community is under lockdown and aids are being provided";
-//     }
-// }
+    resource function get status/[string isoCode]() returns string {
+        log:printInfo("Community support status by ISO Code");
+        return "Community is under lockdown and aids are being provided";
+    }
+}
 
 
 listener http:Listener httpListener = new (9093);
